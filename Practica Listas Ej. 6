@@ -1,0 +1,149 @@
+program Hello;
+type
+    
+    espectro = 1..7;
+
+    sonda = record
+        nombre : string;
+        tiempo : integer;
+        costoFabricacion : real;
+        costoMantenimiento : real;
+        rango : espectro;
+    end;
+    
+    
+    //creando listas
+    lista = ^nodo;
+    
+    nodo = record
+        son : sonda;
+        sig : lista;
+    end;
+        
+    spectrumRange = array [1..7] of integer;
+
+//modulos
+
+    procedure leerSonda(var s : sonda);
+    begin
+        write('ingrese el nombre de la sonda: ');
+        readln(s.nombre);
+        write('ingrese el tiempo (en meses) de la mision: ');
+        readln(s.tiempo);
+        write('ingrese el costo de fabricacion: ');
+        readln(s.costoFabricacion);
+        write('ingrese el costo de mantenimiento: ');
+        readln(s.costoMantenimiento);
+        write('ingrese el rango de espectro de la sonda (1 entre 7): ');
+        readln(s.rango);
+    end;
+
+    procedure agregarAtras(var l,ult : lista; s : sonda);
+    var
+        nuevo : lista;
+    begin
+        new(nuevo);
+        nuevo^.son := s;
+        nuevo^.sig := nil;
+        if(l = nil) then begin
+            l := nuevo;        
+        end
+        else
+            ult^.sig := nuevo;
+        ult := nuevo;
+    end;
+    
+    procedure cargarLista(var l : lista; var promMision, promCostoC : real);
+    var
+        ult : lista;
+        s : sonda;
+        cantSondas : integer;
+    begin
+        promMision := 0;
+        promCostoC := 0;
+        cantSondas := 0;
+        repeat
+            leerSonda(s);
+            cantSondas := cantSondas + 1;
+            promMision := promMision + s.tiempo;
+            promCostoC := promCostoC + s.costoFabricacion;
+            agregarAtras(l,ult,s);
+        until(s.nombre = 'GAIA');
+        promMision := promMision / cantSondas;
+        promCostoC := promCostoC / cantSondas;
+    end;
+
+    function sondaSuperaPromMision(promMision : real; mis : real) : boolean; //La cantidad de sondas cuya duración estimada supera la duración promedio de todas las sondas.
+    begin
+        if (mis > promMision) then begin
+            sondaSuperaPromMision := true;
+        end
+        else
+            sondaSuperaPromMision := false;
+    end;
+    
+    function sondaSuperaPromCostoC (promCostoC : real; cos : real) : boolean; //El nombre de las sondas cuyo costo de construcción supera el costo promedio entre todas las sondas.
+    begin
+        if (cos > promCostoC) then begin
+            sondaSuperaPromCostoC := true;
+        end
+        else
+            sondaSuperaPromCostoC := false;
+    end;
+    
+    procedure sondaMasCara(s : sonda; var sondaMax : string; var costoSondaMax : real); //El nombre de la sonda más costosa (considerando su costo de construcción y de mantenimiento).
+    begin
+        if ((s.costoFabricacion + s.costoMantenimiento) > costoSondaMax) then begin
+            sondaMax := s.nombre;
+            costoSondaMax := s.costoFabricacion + s.costoMantenimiento;
+        end;
+    end;
+    
+    procedure inicializarContadorEspectros(var SR : spectrumRange); //El nombre de la sonda más costosa (considerando su costo de construcción y de mantenimiento).
+    var
+        i : integer;
+    begin
+        for i := 1 to 7 do begin
+            SR[i] := 0;
+        end;
+    end;
+    
+    procedure recorrerLista(l : lista; promMision, promCostoC : real ; var sr : spectrumRange; var sondaMax : string; var cantSupMision : integer);
+    var
+        costoSondaMax : real;
+    begin
+        cantSupMision := 0;
+        costoSondaMax := -1;
+        while (l <> nil) do begin
+            sr[l^.son.rango] := sr[l^.son.rango] + 1;
+            sondaMasCara(l^.son,sondaMax,costoSondaMax);
+            if(sondaSuperaPromMision(promMision,l^.son.tiempo)) then begin
+                cantSupMision := cantSupMision + 1;
+            end;
+            if(sondaSuperaPromCostoC(promCostoC,l^.son.costoFabricacion)) then begin
+                writeln('la sonda : ',l^.son.nombre,' supera el costo de fabricacion promedio');
+            end;
+            l := l^.sig;
+        end;
+    end;
+
+var
+
+    l : lista;
+    sr : spectrumRange;
+    sondaMax : string;
+    promMision, promCostoC : real;
+    cantSupMision, i : integer;
+    
+begin
+    l := nil;
+    inicializarContadorEspectros(sr);
+    cargarLista(l,promMision,promCostoC);
+    recorrerLista(l,promMision, promCostoC,sr,sondaMax,cantSupMision);
+    for i := 1 to 7 do begin
+        writeln('la cantidad de sondas que registraron el rango ',i,' fue: ',sr[i]);
+    end;
+    writeln('la sonda mas cara fue: ', sondaMax);
+    writeln('la cantidad de sondas cuya mision supera el promedio de tiempo de todas las sondas fue: ', cantSupMision);
+end.
+
