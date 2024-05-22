@@ -1,0 +1,104 @@
+program Hello;
+const
+    totProy = 10;
+    
+type
+    
+    tabla = array[1..5] of real;
+    
+    reg = record
+        cant : integer;
+        horas : real;
+    end;
+    
+    rol = array [1..5] of reg;
+
+    participante = record
+        pais : string;
+        codigo : integer;
+        proyecto : string;
+        dev : integer;
+        hs : real;
+    end;
+    
+    proyecto = array [1..totProy] of rol;
+
+//modulos
+  procedure leerParticipante(var p : participante);
+  begin
+    write('ingrese el codigo de proyecto: ');
+    readln(p.codigo);
+      if (p.codigo <> -1) then begin
+        write('ingrese el pais del developer: ');
+        readln(p.pais);
+        write('ingrese el nombre del proyecto: ');
+        readln(p.proyecto);
+        write('ingrese el rol que cumplio el dev (1/2/3/4/5): ');
+        readln(p.dev);
+        write('ingrese la cantidad de horas trabajadas: ');
+        readln(p.hs);
+      end;
+  end;
+  
+  procedure inicializarRoles(var tab : tabla);
+  begin
+    tab[1] := 35.20;
+    tab[2] := 27.45;
+    tab[3] := 31.03;
+    tab[4] := 44.28;
+    tab[5] := 39.87;
+  end;
+ 
+  procedure registrarProyectos(tab : tabla;var proyectos : proyecto;var montoTotArg : real);
+  var
+    aux : participante;
+  begin
+    leerParticipante(aux);
+    while(aux.codigo <> -1) and (aux.codigo <= totProy) do begin
+        proyectos[aux.codigo][aux.dev].cant := proyectos[aux.codigo][aux.dev].cant + 1;
+        proyectos[aux.codigo][aux.dev].horas := proyectos[aux.codigo][aux.dev].horas + aux.hs;
+        if (aux.pais = 'Argentina') then begin
+            montoTotArg := montoTotArg + (aux.hs * tab[aux.dev]);
+        end;
+        leerParticipante(aux);
+    end;
+  end;
+  
+  procedure estatsProyectos(tab : tabla;proyectos : proyecto; var totAdmDB : real; var codigoMin : integer);
+  var
+    i,j : integer;
+    totMonto,min : real;
+  begin
+    totAdmDB := 0;
+    min := 9999;
+    for i := 1 to totProy do begin
+        for j := 1 to 5 do begin
+            totMonto := proyectos[i][j].cant * (proyectos[i][j].horas * tab[j]);
+            if (j = 3) then begin
+                totAdmDB := totAdmDB + proyectos[i][j].horas;
+            end;
+            if (j = 4) then begin
+                writeln('la cantidad de arquitectos de software del proyecto con codigo: ',i,' es : ',proyectos[i][j].cant);
+        end;
+        if (totMonto <= min) then begin
+            min := totMonto;
+            codigoMin := i;
+        end;
+    end;
+  end;
+  end;
+  
+var
+    proyectos : proyecto;
+    codMin : integer;
+    tablaVH : tabla;
+    totAdmDB,montoTotArg : real;
+    
+begin
+    inicializarRoles(tablaVH);
+    registrarProyectos(tablaVH,proyectos,montoTotArg);
+    estatsProyectos(tablaVH,proyectos,totAdmDB,codMin);
+    writeln('el monto total invertido en desarrolladores con residencia en Argentina fue de: ',montoTotArg:0:2);
+    writeln('la cantidad de Administradores de Bases de datos en total es de : ',totAdmDB:0:2);
+    writeln('el proyecto ',codMin,' fue el que tuvo menor monto de ingreso');
+end.
