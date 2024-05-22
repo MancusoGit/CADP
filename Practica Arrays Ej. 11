@@ -1,0 +1,90 @@
+program vectoresEj11;
+const
+    cantFotos = 200;
+type
+    foto = record
+        titulo : string;
+        autor : string; 
+        mg : integer; 
+        clics : integer;
+        comentarios : integer;
+    end;
+    
+    fotos = array[1..cantFotos] of foto;
+    
+  procedure leerFoto(var f : foto);
+  begin 
+    write('ingrese el titulo de la foto: ');
+    readln(f.titulo);
+    write('ingrese el autor de la foto: ');
+    readln(f.autor);
+    write('ingrese la cantidad me gusta: ');
+    readln(f.mg);
+    write('ingrese la cantidad de vistas: ');
+    readln(f.clics);
+    write('ingrese la cantidad de comentarioS: ');
+    readln(f.comentarios);
+  end;
+
+  procedure krmpotic(var v : fotos);
+  var
+    i : integer;
+    f : foto;
+  begin
+    for i := 1 to cantFotos do begin
+        leerFoto(f);
+        v[i] := f;
+    end;
+  end;
+  //a partir de aca conviene que sea un solo recorrido que haga todas las cosas porque se repiten
+  procedure fotoMasVista(v : fotos; var fotoMax : string);
+  var
+    clicsMax : integer;
+    i : integer;
+  begin
+    clicsMax := -1;
+    for i := 1 to cantFotos do begin
+        if(v[i].clics > clicsMax) then begin
+            clicsMax := v[i].clics;
+            fotoMax := v[i].titulo;
+        end;
+    end;
+  end;
+  
+  procedure likesArtV(v : fotos; var cantAV : integer);
+  var
+    i : integer;
+  begin
+    for i := 1 to cantFotos do begin
+        if(v[i].autor = 'Art Vandelay') then begin
+            cantAV := cantAV + v[i].mg;
+        end;
+    end;
+  end;
+  
+  procedure cantComentarios(v : fotos; var cantTotCom : integer);
+  var
+    i : integer;
+  begin
+    for i := 1 to cantFotos do begin
+        cantTotCom := cantTotCom + v[i].comentarios;
+    end;
+  end;
+  
+var
+   publicaciones : fotos;
+   fotoMaxMG : string;
+   cantTotalComentarios,cantArtVanda : integer;
+   
+begin
+    cantTotalComentarios := 0;
+    cantArtVanda := 0;
+    krmpotic(publicaciones);
+    likesArtV(publicaciones,cantArtVanda);
+    fotoMasVista(publicaciones,fotoMaxMG);
+    cantComentarios(publicaciones,cantTotalComentarios);
+    writeln('foto con mas vistas: ',fotoMaxMG);
+    writeln('cantidad de likes Art Vandelay: ',cantArtVanda);
+    writeln('total de comentarios: ',cantTotalComentarios);
+end.
+    
