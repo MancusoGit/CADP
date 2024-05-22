@@ -1,0 +1,121 @@
+{
+    En astrofísica, una galaxia se identifica por su nombre, su tipo (1. elíptica; 2. espiral; 3. lenticular; 4.
+irregular), su masa (medida en kg) y la distancia en pársecs (pc) medida desde la Tierra. La Unión
+Astronómica Internacional cuenta con datos correspondientes a las 53 galaxias que componen el Grupo Local. 
+Realizar un programa que lea y almacene estos datos y, una vez finalizada la carga,
+informe:
+a. La cantidad de galaxias de cada tipo.
+b. La masa total acumulada de las 3 galaxias principales (la Vía Láctea, Andrómeda y Triángulo) y el
+porcentaje que esto representa respecto a la masa de todas las galaxias.
+c. La cantidad de galaxias no irregulares que se encuentran a menos de 1000 pc.
+d. El nombre de las dos galaxias con mayor masa y el de las dos galaxias con menor masa.
+}
+
+program Hello;
+const 
+    tot = 53;
+
+type
+
+    galaxia = record
+        nombre : string;
+        tipo : integer;
+        masa : real;
+        distancia : real;
+    end;
+
+    g = array [1..tot] of galaxia;
+
+    tipoG = array [1..4] of integer;
+    
+    procedure leerGalaxia(var a : galaxia);
+    begin
+        write('ingrese el nombre de la galaxia: ');
+        readln(a.nombre);
+        write('ingrese el tipo de galaxia (1/2/3/4): ');
+        readln(a.tipo);
+        write('ingrese la masa (kg): ');
+        readln(a.masa);
+        write('ingrese la distancia (parsecs): ');
+        readln(a.distancia);
+    end;
+    
+    procedure registrarGalaxias(var reg : g);
+    var
+        aux : galaxia;
+        i : integer;
+    begin
+        for i := 1 to tot do begin
+            leerGalaxia(reg[i]);
+        end;
+    end;
+    
+    procedure maxYminGax(reg : g; var max1, max2, min1, min2 : real; var gMax1, gMax2, gMin1, gMin2 : string);
+    begin
+        if (reg[i].masa >= max1) then begin
+            max2 := max1;
+            gMax2 := gMax1;
+            max1 := reg[i].masa;
+            gMax1 := reg[i].nombre;
+        end
+        else if (reg[i].masa >= max2) then begin
+            max2 := reg[i].masa;
+            gMax2 := reg[i].nombre;
+        end;
+        
+        if(reg[i].masa <= min1) then begin
+            min2 := min1;
+            gMin2 := gMin1;
+            min1 := reg[i].masa;
+            gMin1 := reg[i].nombre;
+        end;
+        else if (reg[i].masa <= min2) then begin
+            min2 := reg[i].masa;
+            gMin2 := reg[i].nombre;
+        end;
+    end;
+    
+    function TrioPrinc(reg : g) : boolean;
+    begin
+        if ((reg[i].nombre = 'Via Lactea') or (reg[i].nombre = 'Andrómeda') or (reg[i].nombre = 'Triangulo')) then
+            TrioPrinc := true;
+        else
+            TrioPrinc := false;
+    end;
+    
+    procedure laburarGalaxias(reg : g; var cantIrreg : integer; var porcMasa,masaTrio, max1, max2, min1, min2 : real; var gMax1, gMax2, gMin1, gMin2 : string; var tiposGax : tipoG);
+    var
+        i : integer;
+        masaTot : real;
+    begin
+    
+        for i := 1 to tot do begin
+        
+            masaTot := masaTot + reg[i].masa;
+            
+            tiposGax[reg[i].tipo] := tipoG[reg[i].tipo] + 1;
+           
+            
+            maxYminGax(reg,max1, max2, min1, min2,gMax1,gMax2, gMin1, gMin2);
+            
+            if (TrioPrinc(reg)) then 
+                masaTrio := masaTrio + reg[i].masa;
+            
+            if(reg[i].tipo <> 4) and (reg[i].distancia < 1000) then
+                cantIrreg := cantIrreg + 1; 
+            
+        end;
+        
+    end;
+
+var
+    conjGalaxias : g;
+    max1,max2,min1,min2,porcMasa,trioGax : real;
+    cantIrre : integer;
+    GMax1,GMax2,GMin1,GMin2 : string;
+    tiposGax : tipoG;
+    
+begin
+    registrarGalaxias(conjGalaxias);
+                    laburarGalaxias(conjGalaxias,cantIrre,porcMasa,trioGax,max1,max2,min1,min2,GMax1,GMax2,GMin1,GMin2,tiposGax);
+end.
