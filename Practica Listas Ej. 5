@@ -1,0 +1,142 @@
+program krmpotic;
+type
+
+    producto = record
+        cod : integer;
+        desc : string;
+        stockAct : integer;
+        stockMin : integer;
+        precio :real;
+    end;
+    
+    listaP = ^nodo;
+    
+    nodo = record
+        prod : producto;
+        sig : listaP;
+    end;
+    
+//modulos
+    
+    procedure leerProd(var p : producto);
+    begin
+        write('ingrese el codigo del producto: ');
+        readln(p.cod);
+        if (p.cod <> -1) then begin
+            write('ingrese la descripcion del producto: ');
+            readln(p.desc);
+            write('ingrese el stock actual: ');
+            readln(p.stockAct);
+            write('ingrese el stock minimo: ');
+            readln(p.stockMin);
+            write('ingrese el precio del producto: ');
+            readln(p.precio);
+        end;
+    end;
+
+    procedure agregarAtras(var l, ult : listaP; p : producto);
+    var
+        nuevo : listaP;
+    begin
+        new(nuevo);
+        nuevo^.prod := p;
+        nuevo^.sig := nil;
+        if (l = nil) then begin
+            l := nuevo;
+        end
+        else
+            ult^.sig := nuevo;
+        ult := nuevo;
+    end;
+    
+    procedure cargarLista(var l : listaP); //programa ppal
+    var
+        ult : listaP;
+        p : producto;
+    begin
+        leerProd(p);
+        while (p.cod <> -1) do begin
+            agregarAtras(l,ult,p);
+            leerProd(p);
+        end;
+    end;
+    
+    function tresPares(n : integer) : boolean;
+    var
+        dig, cantPar : integer;
+    begin
+        cantPar := 0;
+        while (n <> 0) do begin
+            dig := n mod 10;
+            if ((dig mod 2) = 0) then begin
+                cantPar := cantPar + 1; 
+            end;
+            n := n div 10;
+        end;
+        if (cantPar >= 3) then begin
+            tresPares := true;
+        end
+        else
+            tresPares := false;
+    end;
+    
+    procedure prodsMin(var prodMin1, prodMin2 : integer; var PrecMin1, PrecMin2 : real; p : producto);
+    begin
+        if (p.precio <= precMin1) then begin
+            precMin2 := precMin1;
+            prodMin2 := prodMin1;
+            precMin1 := p.precio;
+            prodMin1 := p.cod;
+        end
+        else if (p.precio <= precMin2) then begin
+            precMin2 := p.precio;
+            prodMin2 := p.cod;
+        end;
+    end;
+    
+    function stockBajo(p : producto) : boolean;
+    begin
+        if (p.stockAct < p.stockMin) then begin
+            stockBajo := true;
+        end
+        else
+            stockBajo := false;
+    end;
+    
+    procedure recorrerLista(l : listaP; var porcStock : real; var codMin1, codMin2 : integer); //programa ppal
+    var
+        precMin1, precMin2 : real;
+        totProd, prodsBajoStock : integer;
+    begin
+        precMin1 := 9999;
+        precMin2 := 9999;
+        totProd := 0;
+        prodsBajoStock := 0;
+        while (l <> nil) do begin
+            totProd := totProd + 1;
+            if (stockBajo(l^.prod)) then begin
+                prodsBajoStock := prodsBajoStock + 1;
+            end;
+            if (tresPares(l^.prod.cod)) then begin
+                writeln('la descripcion del producto ',l^.prod.cod,' es: ',l^.prod.desc);
+            end;
+            prodsMin(codMin1,codMin2,precMin1,precMin2,l^.prod);
+            l := l^.sig;
+        end;
+        porcStock := (prodsBajoStock * 100) / totProd;
+    end;
+    
+    
+var
+    listaProductos : listaP;
+    porcStock : real;
+    codigoMin1, codigoMin2 : integer;
+begin
+    listaProductos := nil;
+    cargarLista(listaProductos);
+    recorrerLista(listaProductos,porcStock,codigoMin1,codigoMin2);
+    writeln('el porcentaje de productos cuyo stock actual esta por debajo del stock minimo es: ',porcStock:0:2,'%');
+    writeln('los codigos de los productos cuyos precios son los mas bajos son :');
+    writeln('el producto codigo ',codigoMin1);
+    writeln('el producto codigo ',codigoMin2);
+end.
