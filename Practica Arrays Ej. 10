@@ -1,0 +1,47 @@
+program regEj10;
+type
+    salarios = array[1..300] of real;
+    
+  procedure leerSalarios(var diml : integer;var s : salarios);
+  var 
+    sal : real;
+    i : integer;
+  begin
+    i := 1;
+    write('ingrese el salario: ');
+    read(sal);
+    while (sal <> 0) do begin 
+      s[i] := sal;
+      i := i + 1;
+      diml := diml + 1;
+      write('ingrese el salario: ');
+      read(sal);
+    end;
+  end;
+  procedure aumento(x : real;diml : integer;var s : salarios);
+  var
+    j : integer;
+  begin
+    for j := 1 to diml do begin
+        s[j] := s[j] + (s[j]*x);
+    end;
+  end;
+  procedure mostrarSalarios(diml : integer;var s : salarios);
+  var
+    k : integer;
+  begin
+    for k := 1 to i do begin
+        writeln('salario: ',s[k]:0:2);
+    end;
+  end;
+var
+    s : salarios;
+    diml : integer;
+    x : real;
+begin
+    x := 0.15;
+    diml := 0;
+    leerSalarios(diml,s);
+    aumento(x,diml,s);
+    mostrarSalarios(diml,s);
+end.
