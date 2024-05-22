@@ -1,1 +1,47 @@
+program tuputamadre;
 
+type
+    lista = ^nodo;
+    nodo = record
+        num : integer;
+        sig : lista;
+    end;
+    
+//modulos
+  procedure armarNodo(var L : lista; v : integer); //es un agregar adelante
+  var
+    aux : lista;
+  begin
+    new(aux);
+    aux^.num := v;
+    aux^.sig := L;
+    L := aux;
+  end;
+  
+  procedure recorroLista(L : lista);
+  begin
+    while(L <> nil) do begin
+        write('el numero es: ');
+        writeln(L^.num);
+        L := L^.sig;
+    end;
+  end;
+  
+    
+
+var
+    pri : lista;
+    valor : integer;
+    
+
+begin
+    pri := nil;
+    write('Ingrese un valor: ');
+    readln(valor);
+    while(valor <> 0) do begin
+        armarNodo(pri,valor);
+        write('ingrese un valor: ');
+        readln(valor);
+    end;
+    recorroLista(pri);
+end.
