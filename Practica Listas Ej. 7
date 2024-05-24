@@ -130,7 +130,7 @@ type
     
     function H2020(s : sonda) : boolean;
     begin
-        if (s.costoMantenimiento < s.costoFabricacion) and (s.rango > 1) then begin
+        if (s.costoMantenimiento < s.costoFabricacion) and (s.rango <> 1) then begin
             H2020 := true;
         end
         else
@@ -147,6 +147,7 @@ type
             end
             else
                 agregarAtras(listaNoCumple,ult2,l^.son);
+            l := l^.sig;
         end;
     end;
     
@@ -157,6 +158,7 @@ type
         while (listaNoCumple <> nil) do begin
             cantNC := cantNC + 1;
             costoTotal := costoTotal + listaNoCumple^.son.costoFabricacion + listaNoCumple^.son.costoMantenimiento;
+            listaNoCumple := listaNoCumple^.sig;
         end;
     end;
 
@@ -183,5 +185,5 @@ begin
     listaH2020(l,listaH2020SC,listaH2020NC);
     estadisticaListaH2020(listaH2020NC,costoTotal,cantNC);
     writeln('la cantidad de sondas no financiados por H2020 es de: ',cantNC);
-    writeln('el costo total que no sera financiado por estas sondas llega a la suma de: ',costoTotal);
+    writeln('el costo total que no sera financiado por estas sondas llega a la suma de: ',costoTotal:0:2);
 end.
