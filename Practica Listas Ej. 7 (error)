@@ -21,7 +21,7 @@ type
     end;
     
         
-    spectrumRange = array [1..7] of integer;
+    spectrumRange = array [espectro] of integer;
 
 //modulos
 
