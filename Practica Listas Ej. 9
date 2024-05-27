@@ -34,16 +34,20 @@ type
   var
     ant,act : lista;
   begin
-    if (l^.num = n) then //corroboro que no sea el primer numero de la lista
+    act := l;
+    if (l^.num = n) then begin //corroboro que no sea el primer numero de la lista
         l := l^.sig;
+        dispose(act);
+    end;
     ant := l;
     act := l;
     while (act <> nil) do begin //corroboro todos los que siguen 
         if (act^.num = n) then begin
             ant^.sig := act^.sig;
+            dispose(act);
         end;
+        act := ant^.sig;
         ant := act;
-        act := act^.sig;
     end;
   end;
   
