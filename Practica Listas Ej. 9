@@ -39,15 +39,16 @@ type
         l := l^.sig;
         dispose(act);
     end;
-    ant := l;
     act := l;
-    while (act <> nil) do begin //corroboro todos los que siguen 
+    ant := act;
+    while (act <> nil) do begin //corroboro todos los que siguen
         if (act^.num = n) then begin
             ant^.sig := act^.sig;
             dispose(act);
+            act := ant^.sig;
         end;
-        act := ant^.sig;
         ant := act;
+        act := act^.sig;
     end;
   end;
   
