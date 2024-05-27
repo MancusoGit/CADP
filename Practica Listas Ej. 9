@@ -34,8 +34,9 @@ type
   var
     ant,act : lista;
   begin
-    act := l;
+    
     if (l^.num = n) then begin //corroboro que no sea el primer numero de la lista
+        act := l;
         l := l^.sig;
         dispose(act);
     end;
