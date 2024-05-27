@@ -1,0 +1,105 @@
+program aguanteRiver;
+
+type
+    lista = ^nodo;
+    nodo = record
+        num : integer;
+        sig : lista;
+    end;
+    
+//modulos
+  procedure armarNodo(var L : lista; v : integer); //es un agregar adelante
+  var
+    aux : lista;
+  begin
+    new(aux);
+    aux^.num := v;
+    aux^.sig := L;
+    L := aux;
+  end;
+  
+  function estaOrdenadaFormaAsc(l : lista) : boolean; //a. -> recibe la lista como parámetro y retorna true si la misma se encuentra ordenada, o false en caso contrario.
+  var
+    ant : lista;
+  begin
+    ant := l;
+    while(l <> nil) and (ant^.num <= l^.num) do begin
+        ant := l;
+        l := l^.sig;
+    end;
+    estaOrdenadaFormaAsc := (l = nil);
+  end;
+
+  procedure eliminarParametro(var l : lista; n : integer); //b. -> recibe como parámetros la lista y un valor entero, y elimina dicho valor de la lista (si existe).
+  var
+    ant,act : lista;
+  begin
+    if (l^.num = n) then //corroboro que no sea el primer numero de la lista
+        l := l^.sig;
+    ant := l;
+    act := l;
+    while (act <> nil) do begin //corroboro todos los que siguen 
+        if (act^.num = n) then begin
+            ant^.sig := act^.sig;
+        end;
+        ant := act;
+        act := act^.sig;
+    end;
+  end;
+  
+  procedure Sublista(l : lista; a, b : integer; var sl : lista);
+  begin
+    while (l <> nil) do begin
+        if (l^.num < b) and (l^.num > a) then begin
+            armarNodo(sl,l^.num);
+        end;
+        l := l^.sig;
+    end;
+    
+  end;
+  
+  procedure recorroLista(L : lista);
+  begin
+    while(L <> nil) do begin
+        write('el numero es: ');
+        writeln(L^.num);
+        L := L^.sig;
+    end;
+  end;
+  
+
+  
+var
+    pri, sl : lista;
+    valor,a,b : integer;
+    
+
+begin
+    pri := nil;
+    write('Ingrese un valor: ');
+    readln(valor);
+    while(valor <> 0) do begin
+        armarNodo(pri,valor);
+        write('ingrese un valor: ');
+        readln(valor);
+    end;
+    recorroLista(pri);
+    if (estaOrdenadaFormaAsc(pri)) then begin
+        writeln('La lista SI esta ordenada (de forma ascendente)');
+    end
+    else
+        writeln('La lista NO esta ordenada (de forma ascendente)');
+    write('ingrese un numero para chequear si esta en la lista (y eliminarlo): ');
+    readln(valor);
+    eliminarParametro(pri,valor);
+    recorroLista(pri);
+    writeln('ingrese 2 valores para formar una sublista');
+    write('primer valor: ');
+    readln(a);
+    write('segundo valor (mas grande que el primero): ');
+    readln(b);
+    sl := nil;
+    Sublista(pri,a,b,sl);
+    writeln('la sublista contiene los siguientes numeros');
+    recorroLista(sl);
+end.
