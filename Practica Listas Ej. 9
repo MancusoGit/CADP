@@ -45,7 +45,7 @@ type
         if (act^.num = n) then begin
             ant^.sig := act^.sig;
             dispose(act);
-            act := ant^.sig;
+            act := ant;
         end;
         ant := act;
         act := act^.sig;
