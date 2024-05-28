@@ -1,0 +1,155 @@
+program krmpotic;
+const
+    totAlum = 1300;
+    
+type
+    
+    marzo = 1..31;
+    transporte = 1..5;
+    
+    viajeAlum = record //registro de cada viaje
+        codAlu : integer;
+        diaMes : marzo;
+        facu : string;
+        medio : transporte;
+    end;
+    
+    listaViajes = ^nodo; //lista de viajes por alumno
+    
+    nodo = record
+        viaje : viajeAlum;
+        sig : listaViajes;
+    end;
+    
+    mediosT = array [transporte] of integer; //vector contador de viajes por medio
+    
+    viajesAlumnos = array [1..totAlum] of listaViajes; //array total viajes x alumno x dia
+     
+    diasMarzo = array[marzo] of viajesAlumnos; //array de todos los alumnos en 31 dias
+
+//modulos
+
+    procedure regViaje(var v : viajeAlum);
+    begin
+        write('ingrese el codigo de alumno: ');
+        readln(v.codAlu);
+        if (v.codAlu <> -1) then begin
+            write('ingrese el dia del mes (1 - 31): ');
+            readln(v.diaMes);
+            write('ingrese la facultad del alumno: ');
+            readln(v.facu);
+            write('ingrese el medio de transporte del viaje: ');
+            readln(v.medio);
+        end;
+    end;
+    
+    procedure agregoViaje(var l : listaViajes; v : viajeAlum);
+    var
+        nue : listaViajes;
+    begin
+        new(nue);
+        nue^.viaje := v;
+        nue^.sig := l;
+        l := nue;
+    end;
+    
+    procedure registroDias(var TD : diasMarzo; var mt : mediosT);
+    var
+        v : viajeAlum;
+        actDia,actAlu : integer;
+        
+    begin
+        regViaje(v);
+        while(v.codAlu <> -1) do begin
+            actDia := v.diaMes;
+            while (actDia = v.diaMes) and (v.codAlu <> -1) do begin
+                actAlu := v.codAlu;
+                while(actAlu = v.codAlu) and (v.codAlu <> -1) do begin
+                    agregoViaje(TD[v.diaMes][v.codAlu],v);
+                    mt[v.medio] := mt[v.medio] + 1;
+                    regViaje(v);
+                end;
+            end;
+        end;
+    end;
+    
+    procedure inicializarMedios(var mt : mediosT);
+    var
+        i : integer;
+    begin
+        for i := 1 to 5 do begin
+            mt[i] := 0;
+        end;
+    end;
+    
+    procedure inicializarListas(var TD : diasMarzo);
+    var
+        i,j : integer;
+    begin
+        for i := 1 to 31 do begin
+            for j:= 1 to 1300 do begin
+                TD[i][j] := nil;
+            end;
+        end;
+    end;
+    
+    procedure recorroViajes(l : listaViajes; p : mediosPrecios; var biciComb, gastoMas80, masD6Viajes : boolean);
+    var
+        chekB, totV : integer;
+        gastoTotV : real;
+    begin
+        chekB := 0;
+        totV := 0;
+        gastoTotV := 0;
+        while(l <> nil) do begin
+            totV := totV + 1;
+            gastoTotV := gastoTotV + p[l^.viaje.medio];
+            if (l^.medio = 5) then begin
+                chekB := chekB + 1;
+            end;
+            l := l^.sig; 
+        end;
+        if (totV > 6) then begin
+            masD6Viajes := true;
+        end
+        else
+            masD6Viajes := false;
+        if (gastoTotV > 80) then begin
+            gastoMas80 := true;
+        end
+        else
+            gastoMas80 := false;
+        if (chekB <> totV) then begin
+           biciComb := true; 
+        end
+        else
+            biciComb := false;
+    end;
+    
+    procedure procesarAlumnos(TD : diasMarzo; var cantMas6,cantMas80,maxMedT1,maxMedT2,cantMixB : integer)
+    var
+        i,j : integer;
+        bc,m8,v6 : boolean;
+    begin
+        for i := 1 to 31 do begin
+            for j := 1 to 1300 do begin
+                recorroViajes(TD[i][j]^.viaje,bc,m8,v6);
+                if (bc) then
+                    
+                    
+            end;
+        end;
+    end;
+    
+var
+    
+    TD : diasMarzo;
+    MT : mediosT;
+begin
+    inicializarMedios(MT);
+    inicializarListas(TD);
+    registroDias(TD,MT);
+end.
+
+
+
