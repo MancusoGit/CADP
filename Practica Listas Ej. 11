@@ -1,0 +1,75 @@
+program Hello;
+type
+
+    alumno = record
+        num : integer;
+        apellido : string;
+        promedio : real;
+    end;
+
+    listaE = ^nodo;
+    
+    nodo = record
+        alum : alumno;
+        sig : listaE;
+    end;
+
+
+//modulos
+    
+    procedure leerAlumno(var a : alumno);
+    begin
+        write('ingrese el numero del alumno: ');
+        readln(a.num);
+        if (a.num <> 0) then begin
+            write('ingrese el apellido del alumno: ');
+            readln(a.apellido);
+            write('ingrese el promedio del alumno: ');
+            readln(a.promedio);
+        end;
+    end;
+    
+    procedure insertarOrdenado(var l : listaE; a : alumno);
+    var
+        nue,act,ant : listaE;
+    begin
+        new(nue);
+        nue^.alum := a;
+        act := l;
+        ant := l;
+        while (act <> nil) and (a.promedio < act^.alum.promedio) do begin //busqueda del lugar
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act = ant) then begin
+            l := nue;
+        end
+        else 
+            ant^.sig := nue;
+        nue^.sig := act;
+    end;
+    
+    procedure registrarAlumnos(var pri : listaE);
+    var
+        a : alumno;
+    begin
+        leerAlumno(a);
+        while (a.num <> 0) do begin
+            insertarOrdenado(pri,a);
+            leerAlumno(a);
+        end;
+    end;
+    
+var
+    pri,aux : listaE;
+    i : integer;
+
+begin
+    pri := nil;
+    registrarAlumnos(pri);
+    aux := pri;
+    for i := 1 to 10 do begin
+        writeln('el alumno ',aux^.alum.apellido,' numero de estudiante es (',aux^.alum.num,') recibira el premio Joaquín V. González, con un promedio de: ',aux^.alum.promedio:0:2);
+        aux := aux^.sig;
+    end;
+end.
