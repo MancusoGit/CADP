@@ -73,36 +73,54 @@ type
             ant^.sig := nue;
         nue^.sig := act;
     end;
-
-    procedure cargarListaOrdenada(vu : usuarios ; var l : listaU; var vc : vectorContadorRoles);
-    var
-        i : integer;
+    
+    procedure noIngresanMax(u : usuario; var maxDias1, maxDias2 : integer; var emailMax1, emailMax2 : string);
     begin
+        if (u.cantDias > maxDias1) then begin
+            maxDias2 := maxDias1;
+            emailMax2 := emailMax1;
+            maxDias1 := u.cantDias;
+            emailMax1 := u.email;
+        end
+        else if (u.cantDias > maxDias2) then begin
+            maxDias2 := u.cantDias;
+            emailMax2 := u.email;
+        end;
+    end;
+        
+
+
+    procedure cargarListaOrdenada(vu : usuarios ; var l : listaU; var vc : vectorContadorRoles; var emailMax1, emailMax2 : string);
+    var
+        i, maxDias1, maxDias2 : integer;
+    begin
+        maxDias1 := -1;
+        maxDias2 := -1;
         inicializarVectorContador(vc);
         for i := 1 to 3600 do begin
-            insertarOrdenado(l,vu[i]);
+            if(vu[i].revista = 'Económica') then begin
+                insertarOrdenado(l,vu[i]);
+            end;
             vc[vu[i].rol] := vc[vu[i].rol] + 1;
+            noIngresanMax(vu[i],maxDias1,maxDias2,emailMax1,emailMax2);
         end;
     end;
     
-    procedure informarUsuarios(l : listaU; vc : vectorContadorRoles);
+    procedure informarUsuarios(l : listaU; vc : vectorContadorRoles; emailMax1, emailMax2 : string);
     var
         i : integer;
-        ant,ant2 : listaU;
     begin
-        ant := l;
-        while (l <> nil) do begin //a. informar usuario y dias sin entrar al portal.
-            writeln('el usuario con email : ',l^.user.email,' lleva ',l^.user.cantDias,' sin entrar al portal de revistas');
-            ant2 := ant;
-            ant := l;
+        while (l <> nil) do begin  //a. informar usuario y dias sin entrar al portal.
+            writeln('el usuario con email : ',l^.user.email,' lleva ',l^.user.cantDias,' sin entrar al portal de la revista ',l^.user.revista);
             l := l^.sig;
         end;
-        for i := 1 to 4 do begin
+        for i := 1 to 4 do begin //b. informar cant usuarios por rol
                 writeln('la cantidad de usuarios del rol (',i,') es : ',vc[i]);
         end;
+        //c. informar 
         writeln('los email de 2 usuarios que hace mas tiempo que no entran al portal son : ');
-        writeln(ant^.user.email);
-        writeln(ant2^.user.email);
+        writeln(emailMax1);
+        writeln(emailMax2);
     end;
     
     
@@ -111,10 +129,10 @@ var
     users : usuarios;
     roles : vectorContadorRoles;
     pri : listaU;
-
+    emailMax1, emailMax2 : string;
 begin
     cargarVectorUsers(users); //se dispone
     pri := nil;
-    cargarListaOrdenada(users,pri,roles);
-    informarUsuarios(pri,roles);
+    cargarListaOrdenada(users,pri,roles,emailMax1, emailMax2);
+    informarUsuarios(pri,roles,emailMax1, emailMax2);
 end.
