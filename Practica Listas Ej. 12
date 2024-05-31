@@ -1,0 +1,68 @@
+program Hello;
+type
+    celular = record
+        androidVersion : integer;
+        tamañoPantalla : real;
+        RAM : integer;
+    end;
+
+    listaC = ^nodo;
+    
+    nodo = record
+        celu : celular;
+        sig : listaC;
+    end;
+
+
+//modulos
+    
+    procedure leerCelu(var c : celular);
+    begin
+        write('ingrese la version de Android : ');
+        readln(c.androidVersion);
+        write('ingrese el tamaño de la pantalla (en pulgadas) : ');
+        readln(c.tamañoPantalla);
+        write('ingrese el almacenamiento de memoria RAM (en GB) : ');
+        readln(c.RAM);
+    end;
+
+    function 3Giga5pulgadas (c : celular) : boolean;
+    begin
+        3Giga5pulgadas := (c.RAM > 3) and (c.tamañoPantalla >= 5);
+    end;
+    
+    procesarLista(l : listaC; var cant3GB5P : integer; var promPantalla : real);
+    var
+        totCelus, verAct, verActCant : integer;
+    begin
+        totCelus := 0;
+        promPantalla := 0;
+        cant3GB5P := 0;
+        while (l <> nil) do begin
+            verAct := l^.celu.androidVersion;
+            verActCant := 0;
+            while (verAct = l^.celu.androidVersion) and (l <> nil) do begin
+                verActCant := verActCant + 1; 
+                totCelus := totCelus + 1;
+                promPantalla := promPantalla + l^.celu.tamañoPantalla;
+                if (3Giga5pulgadas(l^.celu)) then begin
+                    cant3GB5P := cant3GB5P + 1;
+                end;
+                l := l^.sig;
+            end;
+            writeln('la cantidad de celulares con la version de android ',verAct,' es : ',verActCant);
+        end;
+        promPantalla := promPantalla / totCelus;
+    end;
+
+
+var
+    pri : listaC;
+    cant3GB5P : integer;
+    promPantalla : real;
+
+begin
+    pri := nil;
+    cargarLista(pri); //se dispone
+    procesarLista(pri,cant3GB5P,promPantalla);
+end.
