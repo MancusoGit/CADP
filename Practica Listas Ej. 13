@@ -1,0 +1,120 @@
+program ReticuloEndoplasmatico;
+type
+    r = 1..4;
+
+    usuario = record 
+        email : string;
+        rol : r;
+        revista : string;
+        cantDias : integer;
+    end;
+    
+    usuarios = array [1..3600] of usuario;
+    
+    vectorContadorRoles = array[r] of integer;
+    
+    listaU = ^nodo;
+    
+    nodo = record
+        user : usuario;
+        sig : listaU;
+    end;
+
+
+//modulos
+    procedure leerUsuario(var u : usuario);
+    begin
+        write('ingrese el email del usuario: ');
+        readln(u.email);
+        write('ingrese el rol del usuario (1-4): ');
+        readln(u.rol);
+        write('ingrese el nombre de la revista en la que participa el usuario: ');
+        readln(u.revista);
+        write('ingrese la cantidad de dias desde el ultimo ingreso : ');
+        readln(u.cantDias);
+    end;
+
+    procedure cargarVectorUsers(var vu : usuarios);
+    var
+        u : usuario;
+        i : integer;
+    begin
+        for i := 1 to 5 do begin
+            leerUsuario(u);
+            vu[i] := u;
+        end;
+    end;
+    
+    procedure inicializarVectorContador(var vc : vectorContadorRoles);
+    var
+        i : integer;
+    begin
+        for i := 1 to 4 do begin
+            vc[i] := 0;
+        end;
+    end;
+    
+    procedure insertarOrdenado(var l : listaU; u : usuario);
+    var
+        nue,act,ant : listaU;
+    begin
+        new(nue);
+        nue^.user := u;
+        act := l;
+        ant := l;
+        while (act <> nil) and (u.cantDias > act^.user.cantDias) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act = ant) then begin
+            l := nue;
+        end
+        else 
+            ant^.sig := nue;
+        nue^.sig := act;
+    end;
+
+    procedure cargarListaOrdenada(vu : usuarios ; var l : listaU; var vc : vectorContadorRoles);
+    var
+        i : integer;
+    begin
+        inicializarVectorContador(vc);
+        for i := 1 to 5 do begin
+            insertarOrdenado(l,vu[i]);
+            vc[vu[i].rol] := vc[vu[i].rol] + 1;
+        end;
+    end;
+    
+    procedure informarUsuarios(l : listaU; vc : vectorContadorRoles);
+    var
+        i : integer;
+        ant,ant2 : listaU;
+    begin
+        ant := l;
+        while (l <> nil) do begin //a. informar usuario y dias sin entrar al portal.
+            writeln('el usuario con email : ',l^.user.email,' lleva ',l^.user.cantDias,' sin entrar al portal de revistas');
+            ant2 := ant;
+            ant := l;
+            l := l^.sig;
+        end;
+        for i := 1 to 4 do begin
+                writeln('la cantidad de usuarios del rol (',i,') es : ',vc[i]);
+        end;
+        writeln('los email de 2 usuarios que hace mas tiempo que no entran al portal son : ');
+        writeln(ant^.user.email);
+        writeln(ant2^.user.email);
+    end;
+    
+    
+    
+var
+    users : usuarios;
+    roles : vectorContadorRoles;
+    pri : listaU;
+
+begin
+    cargarVectorUsers(users); //se dispone
+    pri := nil;
+    cargarListaOrdenada(users,pri,roles);
+    informarUsuarios(pri,roles);
+end.
