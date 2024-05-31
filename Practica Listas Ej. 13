@@ -39,7 +39,7 @@ type
         u : usuario;
         i : integer;
     begin
-        for i := 1 to 5 do begin
+        for i := 1 to 3600 do begin
             leerUsuario(u);
             vu[i] := u;
         end;
@@ -79,7 +79,7 @@ type
         i : integer;
     begin
         inicializarVectorContador(vc);
-        for i := 1 to 5 do begin
+        for i := 1 to 3600 do begin
             insertarOrdenado(l,vu[i]);
             vc[vu[i].rol] := vc[vu[i].rol] + 1;
         end;
