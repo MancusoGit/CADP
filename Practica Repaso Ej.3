@@ -1,0 +1,117 @@
+program Hello;
+type
+    viaje = record
+        numViaje : integer;
+        codAuto : integer;
+        dirOrigen : string;
+        dirDestino : string;
+        kmRecorridos : real;
+    end;
+    
+    listaV = ^nodo;
+    
+    nodo = record
+        travel : viaje;
+        sig : listaV;
+    end;
+    
+//modulos
+    
+    procedure leerViaje(var v : viaje);
+    begin
+        readln(v.numViaje);
+        readln(v.codAuto);
+        readln(v.dirOrigen);
+        readln(v.dirDestino);
+        readln(v.kmRecorridos);
+    end;
+
+    procedure insertarOrdenado(var l : listaV; v : viaje);
+    var
+        nue,ant,act : listaV;
+    begin
+        new(nue);
+        nue^.travel := v;
+        act := l;
+        ant := l;
+        while (act <> nil) and (v.codAuto > act^.travel.codAuto) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+    end;
+    
+    procedure insertarOrdenadoV2(var l : listaV; v : viaje);
+    var
+        nue,ant,act : listaV;
+    begin
+        new(nue);
+        nue^.travel := v;
+        act := l;
+        ant := l;
+        while (act <> nil) and (v.numViaje > act^.travel.numViaje) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+    end;
+    
+    procedure cargarLista(var l : listaV);
+    var
+        v : viaje;
+    begin
+        leerViaje(v);
+        while(v.codAuto <> -1) do begin
+            insertarOrdenado(l,v);
+            leerViaje(v);
+        end;
+    end;
+    
+    procedure codigosMaximos(codigoA : integer; distAuto : real ;var codMax1, codMax2 : integer; var maxDist1, maxDist2 : real);
+    begin
+        if (distAuto > maxDist1) then begin
+            maxDist2 := maxDist1;
+            codMax2 := codMax1;
+            maxDist1 := distAuto;
+            codMax1 := codigoA;
+        end
+        else if (distAuto > maxDist2) then begin
+            maxDist2 := distAuto;
+            codMax2 := codigoA;
+        end;
+    end;
+    
+    procedure procesarLista(l : listaV; var nueval : listaV; var codMax1, codMax2 : integer);
+    var
+        maxDist1, maxDist2, distAutoAct : real;
+        codAct : integer;
+    begin
+        maxDist1 := -1;
+        maxDist2 := -1;
+        codMax1 := 0;
+        codMax2 := 0;
+        while (l <> nil) do begin
+            codAct := l^.travel.codAuto;
+            distAutoAct := 0;
+            while (l <> nil) and (codAct = l^.travel.codAuto) do begin
+                if(l^.travel.kmRecorridos > 5) then begin
+                    insertarOrdenadoV2(nueval,l^.travel);
+                end;
+                distAutoAct := distAutoAct + l^.travel.kmRecorridos;
+                l := l^.sig;
+            end;
+            codigosMaximos(codAct,distAutoAct,codMax1,codMax2,maxDist1,maxDist2);
+        end;
+    end;
+
+
+var
+    pri,nuevaL : listaV; 
+    codMax1, codMax2 : integer;
+begin
+    pri := nil;
+    cargarLista(pri); //se dispone
+    nuevaL := nil;
+    procesarLista(pri,nuevaL,codMax1,codMax2);
+    writeln('los codigos de los autos que mas distancia recorrieron fueron : ');
+    writeln(codMax1);
+    writeln(codMax2);
+end.
