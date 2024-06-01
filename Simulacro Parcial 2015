@@ -1,0 +1,93 @@
+program parcialSimuF3;
+type
+
+    genero = 1..8;
+    
+    contadorGenero = array [genero] of real;
+    
+    pelicula = record
+        cod : integer;
+        nombre : string;
+        gen : genero;
+        puntaje : real;
+    end;
+    
+    listaP = ^nodo;
+    
+    nodo = record
+        peli : pelicula;
+        sig : listaP;
+    end;
+    
+    critico = record
+        dni : integer;
+        nombreApellido : string;
+        codPeli : integer;
+        puntajePeli : real;
+    end;
+    
+//modulos
+    
+    procedure leerPeli(var p : pelicula);
+    begin
+        write('ingrese el codigo de la pelicula: ');
+        readln(p.cod);
+        if (p.cod <> 0) then begin
+            write('ingrese el nombre de la pelicula: ');
+            readln(p.nombre);
+            write('ingrese el genero de la pelicula (1-8) : ');
+            readln(p.gen);
+        end;
+    end;
+
+    procedure agregarAdelante(var l : listaP; p : pelicula);
+    var
+        nue : listaP;
+    begin
+        new(nue);
+        nue^.peli := p;
+        nue^.sig := l;
+        l := nue;
+    end;
+    
+    procedure cargarLista(var l : listaP);
+    var
+        p : pelicula;
+    begin
+        leerPeli(p);
+        while (p.cod <> 0) then begin
+            agregarAdelante(l,p);
+            leerPeli(p);
+        end;
+    end;
+
+    function idemParesImpares(n : integer) : boolean;
+    var
+        dig, cantImpar, cantPar : integer;
+    begin
+        cantPar := 0 ;
+        cantImpar := 0;
+        while (n <> 0) do begin
+            dig := n mod 10;
+            if ((dig mod 2) = 0) then
+                cantPar := cantPar + 1;
+            else 
+                cantImpar := cantImpar + 1;
+            n := n div 10;
+        end;
+        if (cantImpar = cantPar) then
+            idemParesImpares := true;
+        else
+            idemParesImpares := false;
+    end;
+    
+    procedure inicializarContadorGenero(var vg : contadorGenero);
+    var
+        i : integer;
+    begin
+        for i := 1 to 8 do begin
+            vg[i] := 0;
+        end;
+    end;
+    
+    procedure eliminarPeli(var l : listaP; codPelicula : integer);
