@@ -1,0 +1,125 @@
+{
+    Una panadería artesanal de la plata vende productos de elaboración propia. La panadería agrupa sus productos. 
+    En 26 categorías. Para cada categoría se conoce su nombre. Y el precio por kilo del producto 
+    La panadería dispone de información de todas las compras realizadas en el último año, de cada compra se conoce el DNI del cliente, el producto según la categoría que compró 
+    Y la cantidad de kilos comprados  
+    La información se encuentra ordenada por DNI de clientes. 
+
+    a) Realizar un módulo que retorne la información de las categorías en una estructura. Apropiada. 
+    La información se lee de teclado sin ningún orden de cada categoría. Se conoce el número entre 1 y 26. Y el precio por kilo (listo)
+
+    b) Realizar un módulo que recibe la información de todas las compras, la información de las categorías e informe: 
+
+        - el cliente que más compras ha realizado 
+
+        - Monto total recaudado por cada categoría. 
+
+        - Cantidad de total de compras de clientes con DNI compuesto por al menos 3 dígitos pares.         
+}
+
+program parcialGonza;
+type
+    categoria = 1..26;
+    
+    producto = record
+        cat : categoria;
+        precioK : real;
+    end;
+    
+    categorias = array [categoria] of real;
+    
+    compra = record
+        dni : integer;
+        prod : categoria;
+        cantK : real;
+    end;
+    
+    listaC = ^nodo;
+    
+    nodo = record;
+        venta : compra;
+        sig : listaC;
+    end;
+
+
+//modulos
+    
+    procedure leerProducto (var p : producto);
+    begin
+        write('ingrese categoria producto (1 - 26): ');
+        readln(p.cat);
+        write('ingrese el precio por kilo: ');
+        readln(p.precioK);
+    end;
+    
+    procedure inicializarCategorias(var vc : categorias);
+    var
+        i : integer;
+    begin
+        for i := 1 to 26 do begin
+            vc[i] := 0;
+        end;
+    end;
+
+    procedure cargarCategorias(var vc : categorias);
+    var
+        p : producto;
+        i : integer;
+    begin
+        for i := 1 to 26 do begin
+            leerProducto(p);
+            vc[p.cat] := p.precioK;
+        end;
+    end;
+    
+    procedure leerCompra(var c : compra); //se dispone
+    
+    procedure cargarLista(var l : listaC); //se dispone
+    
+    function 3pares (n : integer) : boolean;
+    var
+        dig,cantPares : integer;
+    begin
+        cantPares := 0;
+        while (n <> 0) do begin
+            dig := n mod 10;
+            if ((dig mod 2) = 0) then begin
+                cantPares := cantPares + 1;
+            end;
+            n := n div 10;
+        end;
+        3pares := (cantPares >= 3);
+    end;
+
+    
+    procedure informar(l : listaC; vc : categorias);
+    var
+        dniAct,oligarcaDni,maxOligarca,totComprasCli,totComprasCliDniPar,i : integer;
+        contadorProds : categorias;
+    begin
+        inicializarCategorias(contadorProds);
+        totComprasCliDniPar := 0;
+        while (l <> nil) do begin
+            dniAct := l^.venta.dni;
+            totComprasCli := 0;
+            while (l <> nil) and (dniAct = l^.venta.dni) do begin
+                totComprasCli := totComprasCli + 1;
+                contadorProds[l^.venta.prod] := contadorProds[l^.venta.prod] + (vc[l^.venta.prod] * l^.venta.cantK);
+                l := l^.sig;
+            end;
+            if (3pares(dniAct)) then
+                totComprasCliDniPar := totComprasCliDniPar + totComprasCli;
+            if (totComprasCli >= maxOligarca) then begin
+                maxOligarca := totComprasCli;
+                oligarcaDni := dniAct;
+            end;
+        end;
+        write(oligarcaDni);
+        for i := 1 to 26 do begin
+            write(contadorProds[i]);
+        end;
+        write(totComprasCliDniPar);
+    end;
+
+
+    
