@@ -60,6 +60,20 @@ type
             leerPeli(p);
         end;
     end;
+    
+    procedure leerCritica(var c : critico);
+    begin
+        write('ingrese el codigo de la pelicula : ');
+        readln(c.codPeli);
+        if (c.codPeli <> -1) then begin
+            write('ingrese el dni del critico : ');
+            readln(c.dni);
+            write('ingrese el nombre y apellido del critico: ');
+            readln(c.nombreApellido);
+            write('ingrese el puntaje de la pelicula segun el critico: ');
+            readln(c.puntajePeli);
+        end;
+    end;
 
     function idemParesImpares(n : integer) : boolean;
     var
@@ -91,3 +105,101 @@ type
     end;
     
     procedure eliminarPeli(var l : listaP; codPelicula : integer);
+    var
+        act,ant : listaP;
+    begin
+        act := l;
+        ant := l;
+        while (act <> nil) and (act^.peli.cod <> codPelicula) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act <> nil) then begin
+            if (act = l) then begin
+                l := l^.sig;
+            end
+            else
+                ant^.sig := act^.sig;
+            dispose(act);
+        end;
+    end;
+    
+    procedure ActualizarLista(var l : listaP; codi : integer; puntajeP : real);
+    var
+        aux : listaP;
+    begin
+        aux := l;
+        while (aux <> nil) and (aux^.peli.cod <> codi) do begin
+            aux := aux^.sig;
+        end;
+        if (aux <> nil) then begin
+            aux^.peli.puntaje := puntajeP;
+        end;
+    end;
+    
+    procedure listaActualizada(var l : listaP);
+    var
+        c : critico;
+        codAct : integer;
+        cantCriticas : integer;
+        puntajePromedio : real;
+    begin
+        leerCritica(c);
+        while (c.codPeli <> -1) do begin
+            codAct := c.codPeli;
+            puntajePromedio := 0;
+            cantCriticas := 0;
+            while (codAct = c.codPeli) and (c.codPeli <> -1) do begin
+                puntajePromedio := puntajePromedio + c.puntajePeli;
+                cantCriticas := cantCriticas + 1;
+                if (idemParesImpares(c.dni)) then begin
+                    writeln(c.nombreApellido);
+                end;
+                leerCritica(c);
+            end;
+            puntajePromedio := puntajePromedio / cantCriticas;
+            ActualizarLista(l,codAct,puntajePromedio);
+        end;
+    end;
+    
+    procedure cargarPuntajeGeneros(var vg : contadorGenero; l : listaP);
+    begin
+        while (l <> nil) do begin  
+            vg[l^.peli.gen] := vg[l^.peli.gen] + l^.peli.puntaje;
+            l := l^.sig;
+        end;
+    end;
+    
+    procedure generoMayorPuntaje(var maxGenero : integer; vg : contadorGenero);
+    var
+        i : integer;
+        maxPuntaje : real;
+    begin
+        maxPuntaje := -1;
+        for i := 1 to 8 do begin
+            if(vg[i] > maxPuntaje) then begin
+                maxPuntaje := vg[i];
+                maxGenero := i;
+            end;
+        end;
+    end;
+    
+    
+var
+    
+    pri : listaP;
+    generos : contadorGenero;
+    maxGenero, codigoPeliEliminar : integer;
+    
+begin
+    pri = nil;
+    cargarLista(pri); //se dispose
+    inicializarContadorGenero(generos);
+    listaActualizada(pri);
+    cargarPuntajeGeneros(pri,generos);
+    generoMayorPuntaje(generos,maxGenero);
+    writeln('el mes que mas monto recaudo fue : ',maxGenero);
+    readln(codigoPeliEliminar); //se dispone
+    eliminarPeli(pri,codigoPeliEliminar);
+end.
+    
