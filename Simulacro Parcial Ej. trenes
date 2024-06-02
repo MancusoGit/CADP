@@ -1,0 +1,125 @@
+program krmpotic;
+type
+    mesesA = 1..12;
+    ciudades = 1..20;
+    
+    
+    viajeTren = record
+        codTren : integer;
+        mes : mesesA;
+        cantPasajeros : integer;
+        codCiudad: ciudades;
+    end;
+    
+    listaV = ^nodo;
+    
+    nodo = record
+        viaje : viajeTren;
+        sig : listaV;
+    end;
+    
+    costoTicket = array[ciudades] of real;    
+
+    tren = record
+        codigoTren : integer;
+        cantViajes : integer;
+    end;
+    
+    listaT = ^nodoT;
+    
+    nodoT = record
+        train : tren;
+        sig : listaT;
+    end;
+    
+    vectorContadorMeses = array[mesesA] of real;
+    
+    
+
+//modulos
+    
+    procedure leerViaje (var v : viaje); //se dispone
+
+    procedure insertarOrdenado(var l : listaV; v : viaje); //se dispone
+    
+    procedure cargarLista(var l : listaV); //se dispone
+    
+    procedure cargarCostoTicket(var vt : costoTicket); //se dispone
+    
+    procedure inicializarVectorMeses (var vm : vectorContadorMeses);
+    var
+        i : integer;
+    begin
+        for i := 1 to 12 do begin
+            vm[i] := 0;
+        end;
+    end;
+    
+    procedure agregarAtras(var l,ult : listaT; newTren : tren);
+    var
+        nue : listaT;
+    begin
+        new(nue);
+        nue^.train := newTren;
+        if (l = nil) then begin
+            l := nue;
+        end
+        else
+            ult^.sig := nue;
+        ult := nue;
+    end;
+    
+    procedure procesarViajes(l : listaV; vt : costoTicket; var lt : listaT; var vm : vectorContadorMeses);
+    var
+        trenAct,promPasajeros : integer;
+        nuevoTren : tren;
+        ult : listaT;
+    begin
+        while (l <> nil) do begin
+            trenAct := l^.viaje.codTren;
+            nuevoTren.codigoTren := trenAct;
+            nuevoTren.cantViajes := 0;
+            agregarAtras(lt,ult,nuevoTren);
+            promPasajeros := 0;
+            while (trenAct = l^.viaje.codTren) and (l <> nil) do begin
+                ult^.train.cantViajes := ult^.train.cantViajes + 1;
+                promPasajeros := promPasajeros + l^.viaje.cantPasajeros;
+                vm[l^.viaje.mes] := vm[l^.viaje.mes] + (l^.viaje.cantPasajeros * vt[l^.viaje.codCiudad]);
+                l := l.sig;
+            end;
+            promPasajeros := promPasajeros / ult^.train.cantViajes;
+            writeln('el tren ',codAct,' tuvo un promedio de ',promPasajeros,' por viaje.');
+        end;
+    end;
+    
+    procedure mesMayorMonto(vm : vectorContadorMeses; var mesMaxMonto);
+    var
+        i : integer;
+        montoMax : real;
+    begin
+        montoMax := -1;
+        for i := 1 to 12 do begin
+            if (vm[i] > montoMax) then begin
+                montoMax := vm[i];
+                mesMaxMonto := i;
+            end;
+        end;
+    end;
+    
+
+var
+    priV : listaV;
+    priT : listaT;
+    vm : vectorContadorMeses;
+    vt : costoTicket;
+    mesMayorMontoRecaudado : integer;
+begin
+    priV := nil;
+    cargarCostoTicket(vt); //se dispone
+    cargarLista(priV); //se dispone
+    inicializarVectorMeses(vm);
+    priT := nil;
+    procesarViajes(priV,vt,priT,vm);
+    mesMayorMontoRecaudado(vm,mesMayorMontoRecaudado);
+    writeln(mesMayorMontoRecaudado);
+end.
