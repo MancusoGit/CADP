@@ -88,7 +88,7 @@ type
                 l := l.sig;
             end;
             promPasajeros := promPasajeros / ult^.train.cantViajes;
-            writeln('el tren ',codAct,' tuvo un promedio de ',promPasajeros,' por viaje.');
+            writeln('el tren ',trenAct,' tuvo un promedio de ',promPasajeros,' por viaje.');
         end;
     end;
     
