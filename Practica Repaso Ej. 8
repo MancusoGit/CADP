@@ -1,0 +1,152 @@
+program semirapido;
+type
+    
+    transfer = 1..7;
+    
+    meses = 1..11;
+    
+    date = record
+        dia : integer;
+        mes : meses;
+    end;    
+    
+    transferencia = record
+        cuentaOrigen : integer;
+        dniTitular : integer;
+        cuentaDestino : integer;
+        dniDestino : integer;
+        fecha : date;
+        hora : integer;
+        monto : real;
+        codigo : transfer;
+    end;
+    
+    listaT = ^nodo;
+    
+    nodo = record
+        transf : transferencia;
+        sig : listaT;
+    end;
+    
+    vectorCodigos = array[transfer] of integer;
+    
+//modulos
+    
+    procedure insertarOrdenado(var l : listaT; t : transferencia);
+    var
+        nue,act,ant : listaT;
+    begin
+        new(nue);
+        nue^.transf := t;
+        act := l;
+        ant := act;
+        while (act <> nil) and (t.cuentaOrigen > act^.transf.cuentaOrigen) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act = ant) then begin
+            l := nue;
+        end
+        else
+            ant^.sig := nue;
+        nue^.sig := act;
+    end;
+    
+    procedure inicializarVectorContador(var vt : vectorCodigos);
+    var
+        i : integer;
+    begin
+        for i := 1 to 7 do begin
+            vt[i] := 0;
+        end;
+    end;
+    
+    function cumple(t : transferencia) : boolean;
+    begin
+        cumple := (t.cuentaOrigen <> t.cuentaDestino);
+    end;
+    
+    function verificar(t : transferencia) : boolean;
+    var
+       dig,cantImpar,cantPar : integer;
+    begin
+        if (t.fecha.mes = 7) then begin
+            cantPar := 0;
+            cantImpar := 0;
+            while (t.cuentaDestino <> 0) do begin
+                dig := t.cuentaDestino mod 10;
+                if ((dig mod 2) = 0) then begin
+                    cantPar := cantPar + 1;
+                end
+                else
+                    cantImpar := cantImpar + 1;
+                t.cuentaDestino := t.cuentaDestino div 10;
+            end;
+            verificar := (cantPar < cantImpar);
+        end
+        else
+            verificar := false;
+    end;
+    
+    procedure maximo(vt : vectorCodigos);
+    var
+        i, cantMax, maxCod : integer;
+    begin
+        cantMax := -1;
+        for i := 1 to 7 do begin
+            if(vt[i] >= cantMax) then begin
+                cantMax := vt[i];
+                maxCod := i;
+            end;
+        end;
+        writeln('el codigo que mas transferencias tuvo fue: ', maxCod);
+    end;
+    
+    procedure nuevaLista(lo : listaT; var ln : listaT);
+    begin
+        while (lo <> nil) do begin
+            if (cumple(lo^.transf)) then begin
+                insertarOrdenado(ln,lo^.transf);
+            end;
+            lo := lo^.sig;
+        end;
+    end;
+    
+    procedure procesarTransfTerceros(l : listaT);
+    var
+        vt : vectorCodigos;
+        actCuenta, cantEspecial : integer;
+        totMontoTransf : real;
+    begin
+        cantEspecial := 0;
+        inicializarVectorContador(vt);
+        while (l <> nil) do begin
+            totMontoTransf := 0;
+            actCuenta := l^.transf.cuentaOrigen;
+            while (l <> nil) and (actCuenta = l^.transf.cuentaOrigen) do begin
+                vt[l^.transf.codigo] := vt[l^.transf.codigo] + 1;
+                totMontoTransf := totMontoTransf + l^.transf.monto;
+                if(verificar(l^.transf)) then begin
+                    cantEspecial := cantEspecial + 1;
+                end;
+                l := l^.sig;
+            end;
+            writeln('la cuenta ',actCuenta,' tuvo un monto total transferido a terceros de: ',totMontoTransf);
+        end;
+        writeln('la cantidad de transferencias del mes de junio en las que la cuenta de destino tenia mas numeros impares que  pares fue ', cantEspecial);
+        maximo(vt);
+    end;
+
+var
+    listaTransf, listaTercerosOrdenada : listaT;
+    vectorContadorCodigos : vectorCodigos;
+begin
+    listaTransf := nil;
+    cargarLista(listaTransf); //se dispone
+    listaTercerosOrdenada := nil;
+    nuevaLista(listaTransf,listaTercerosOrdenada);
+    procesarTransfTerceros(listaTercerosOrdenada);
+end.
+    
+    
+    
