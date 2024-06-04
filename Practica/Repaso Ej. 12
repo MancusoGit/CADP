@@ -1,0 +1,135 @@
+program ej12;
+type
+
+    tipoCuota = 1..4;
+    
+    costo = array [tipoCuota] of real;
+    
+    cliente = record
+        nom : string;
+        dni : integer;
+        edad : integer;
+        sub : tipoCuota;
+    end;    
+    
+    listaC = ^nodo;
+    
+    nodo = record
+        cli : cliente;
+        sig : listaC;
+    end;
+    
+//modulos
+    
+    procedure leerCli(var c : cliente);
+    begin
+        write('ingrese el dni del cliente : ');
+        readln(c.dni);
+        if (c.dni <> 0) then begin
+            write('ingrese el nombre del cliente: ');
+            readln(c.nom);
+            write('ingrese la edad del cliente: ');
+            readln(c.edad);
+            write('ingrese el tipo de cuota: ');
+            readln(c.sub);
+        end;
+    end;
+    
+    procedure agregarAdelante(var l : listaC; c : cliente);
+    var
+        nue : listaC;
+    begin
+        new(nue);
+        nue^.cli := c;
+        nue^.sig := l;
+        l := nue;
+    end;
+    
+    procedure cargarLista(var l : listaC);
+    var
+        c : cliente;
+    begin
+        leerCli(c);
+        while (c.dni <> 0) do begin
+            agregarAdelante(l,c);
+            leerCli(c);
+        end;
+    end;
+    
+    funcion filtro(c : cliente) : boolean;
+    begin
+        filtro := ((c.edad > 40) and ((c.sub = 3) or (c.sub = 4));
+    end;
+    
+    procedure insertarOrdenado(var l : listaC; c : cliente);
+    var
+        nue : listaC;
+    begin
+        new(nue);
+        nue^.cli := c;
+        act := l;
+        ant := act;
+        while (act <> nil) and (c.dni > act^.cli.dni) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+    end;
+    
+    procedure inicializarVectorContador(var vc : costo);
+    var
+        i : integer;
+    begin
+        for i := 1 to 4 do begin
+            vc[i] := 0;
+        end;
+    end;
+    
+    procedure maximos(subs,n : integer; var cantMax1, cantMax2, subMax1, subMax2 : integer);
+    begin
+        if (subs >= cantMax1) then begin
+            cantMax2 := cantMax1;
+            cantMax1 := subs;
+            subMax2 := subMax1;
+            subMax1 := n;
+        end
+        else if (subs >= cantMax2) then begin
+            cantMax2 := subs;
+            subMax2 := n;
+        end;
+    end;
+    
+    procedure procesarClientes(lo : listaC; vecCostos : costo; var ln : listaC);
+    var
+       total : real;
+       cantMax1, cantMax2, subMax1, subMax2 : integer;
+       contadorCost : costo;
+    begin
+        total := 0;
+        cantMax1 := -1;
+        subMax1 := 0;
+        cantMax2 := -1;
+        inicializarVectorContador(contadorCost);
+        while (lo <> nil) do begin
+            total := total + vecCostos[lo^.cli.sub];
+            contadorCost[lo^.cli.sub] := contadorCost[lo^.cli.sub] + 1;
+            if (filtro(l^.cli)) then begin
+                insertarOrdenado(ln,l^.cli);
+            end;
+        end;
+        for i := 1 to 4 do begin
+            maximos(contadorCost[i],i,cantMax1, cantMax2, subMax1, subMax2)
+        end;
+        writeln('la ganancia total de fortacos es de : ',total);
+        writeln('las 2 subscripciones con mas clientes son : ',subMax1,' y ',subMax2);
+    end;
+    
+var
+    priC, priN : listaC;
+    costos : costo;
+begin
+    priC := nil;
+    cargarLista(priC);
+    cargarCostos(costos); //se dispone
+    priN := nil;
+    procesarClientes(priC,costos,priN);
+end.
