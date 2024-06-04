@@ -1,0 +1,125 @@
+program Hello;
+type
+    
+    barcos = 15..2500;
+    
+    viaje = record
+        numBarco : barcos;
+        ano : integer;
+        cantPasajeros : integer;
+        ciudadDest : string;
+    end;
+    
+    listaB = ^nodo;
+    
+    nodo = record
+        travel : viaje;
+        sig : listaB;
+    end;
+    
+    capacidadBarcos = array [barcos] of integer;
+    
+//modulos
+    
+    procedure leerViaje(var v : viaje); //se dispone
+    begin
+    end;
+    
+    procedure cargarLista(var l : listaB): //se dispone
+    var
+    begin
+    end;
+    
+    procedure cargarVectorCapMax(var vc : capacidadBarcos);
+    var
+    begin
+    end;
+    
+    procedure inicializarVectorContador(vb : capacidadBarcos);
+    var
+        i : integer;
+    begin
+        for i := 1 to 2500 do begin
+            vb[i] := 0;
+        end;
+    end;
+    
+    procedure insertarOrdenado(var l : listaB, v : viaje);
+    var
+        nue,act,ant : listaB;
+    begin
+        new(nue);
+        nue^.travel := v;
+        act := l;
+        ant := act;
+        while (act <> nil) and (v.ano > act^.travel.ano) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act = ant) then 
+            l := nue;
+        else
+            ant^.sig := nue;
+        nue^.sig := act;
+    end;
+    
+    function cumple(v : viaje) : boolean;
+    begin
+        cumple := ((v.ciudadDest = 'Rio de Janeiro') and ((v.ano mod 6) = 0));
+    end;
+    
+    procedure maximo(codN,capN : integer; var codMax,capMax : integer);
+    begin
+        if(capN >= capMax) then begin
+            capMax := capN;
+            codMax := codN;
+        end;
+    end;
+    
+    procedure informarBarcos(vb,vc : capacidadBarcos);
+    var
+        i,maxCapB,BarcoMax : integer;
+        begin
+        maxCapB := -1;
+        //vb = vector contador para cada barco; vc = vector con la capacidad maxima de cada barco
+        for i := 15 to 2500 do begin
+            if(vb[i] > vc[i]) then begin
+                writeln('el barco con codigo ',i,' supero la capacidad maxima');
+            end;
+            maximo(i,vb[i],BarcoMax,maxCapB);
+        end;
+        writeln('el codigo del barco que mas personas transporto fue ',BarcoMax,' con un total de ',maxCapB,' personas');
+    end;
+    
+    procedure actualizarVectorContador(var vb : capacidadBarcos; v : viaje);
+    begin
+        vb[v.numBarco] := vb[v.numBarco] + v.cantPasajeros;
+    end;
+    
+    procedure procesar(lo : listaB; var ln : listaB; vc : capacidadBarcos);
+    var
+        vb : capacidadBarcos;
+    begin
+        inicializarVectorContador(vb);
+        while (lo <> nil) do begin
+            if (cumple(lo^.travel)) then begin  
+                insertarOrdenado(ln,lo^.travel);
+            end;
+            actualizarVectorContador(vb,lo^.travel);
+        end;
+        informarBarcos(vb,vc);
+    end;
+    
+var
+    priV,priN : listaB;
+    vectorCapMax : capacidadBarcos;
+begin
+    priV := nil;
+    cargarLista(priV); //se dispone
+    cargarVectorCapMax(vectorCapMax); //se dispone
+    priN := nil;
+    procesar(priV,priN,vectorCapMax);
+end.
+    
+    
+    
