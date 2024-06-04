@@ -1,0 +1,200 @@
+program semirapido;
+type
+
+    listaN = ^nodito;
+    
+    nodito = record
+        nota : integer;
+        sig : listaN;
+    end;
+    
+    alumno = record
+        num : integer;
+        apellido : string;
+        nombres : string;
+        correo : string;
+        ingreso : integer;
+        egreso : integer;
+        notas : listaN;
+    end;
+
+    listaM = ^nodo;
+    
+    nodo = record
+        alu : alumno;
+        sig: listaM;
+    end;
+    
+//modulos
+    
+    procedure insertarOrdenado (var l : listaN; n : integer);
+    var
+        nue,act,ant : listaN;
+    begin
+        new(nue);
+        nue^.nota := n;
+        act := l;
+        ant := act;
+        while (act <> nil) and  (n < act^.nota) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act = ant) then begin
+            l := nue;
+        end
+        else
+            ant^.sig := nue;
+        nue^.sig := act;
+    end;
+    
+    
+    procedure leerAlumno (var a : alumno);
+    var
+        i,n : integer;
+    begin
+        write('ingrese el numero de alumno: ');
+        readln(a.num);
+        if (a.num <> -1) then begin
+            write('ingrese el apellido del alumno: ');
+            readln(a.apellido);
+            write('ingrese el/los nombre/s del alumno: ');
+            readln(a.nombres);
+            write('ingrese el email del alumno: ');
+            readln(a.correo);
+            write('ingrese el año de ingreso del alumno: ');
+            readln(a.ingreso);
+            write('ingrese el año de egreso del alumno: ');
+            readln(a.egreso);
+            a.notas := nil;
+            for i := 1 to 24 do begin
+                write('ingrese las notas del alumno (son 24): ');
+                readln(n);
+                insertarOrdenado(a.notas,n);
+            end;
+        end;
+    end;
+    
+    procedure agregarAdelante(var l : listaM; a : alumno);
+    var
+        nue : listaM;
+    begin
+        new(nue);
+        nue^.alu := a;
+        nue^.sig := l;
+        l := nue;
+    end;
+    
+    procedure cargarAlumnos(var l : listaM);
+    var
+        a : alumno;
+    begin
+        leerAlumno(a);
+        while(a.num <> -1) do begin
+            agregarAdelante(l,a);
+            leerAlumno(a);
+        end;
+    end;
+    
+    function aluRaro (a : alumno) : boolean;
+    var
+        dig,cantDig,cantImpar : integer;
+    begin
+        if (a.ingreso = 2012) then begin
+            cantDig := 0;
+            cantImpar := 0;
+            while(a.num <> 0) do begin
+                dig := a.num mod 10;
+                if ((dig mod 2) = 1) then begin
+                    cantImpar := cantImpar + 1;
+                end;
+                cantDig := cantDig + 1;
+                a.num := a.num div 10;
+            end;
+            aluRaro := (cantDig = cantImpar);
+        end
+        else
+            aluRaro := false;
+    end;
+    
+    procedure masRapidos(a : alumno; var aluFast1,aluFast2 : alumno);
+    begin
+        if ((a.egreso - a.ingreso) <= (aluFast1.egreso - aluFast1.ingreso)) then begin
+            aluFast2 := aluFast1;
+            aluFast1 := a;
+        end
+        else if ((a.egreso - a.ingreso) <= (aluFast2.egreso - aluFast2.ingreso)) then begin
+            aluFast2 := a;
+        end;
+    end;
+    
+    procedure informarNotasAlu(a : alumno);
+    var
+        prom : real;
+    begin
+        prom := 0;
+        while (a.notas <> nil) do begin
+            prom := prom + a.notas^.nota; 
+            a.notas := a.notas^.sig;
+        end;
+        prom := prom / 24;
+        writeln('el alumno con numero ',a.num,' tiene de promedio en su carrera : ',prom);
+    end;
+    
+    procedure procesarAlumnos(l : listaM);
+    var
+        cantRaros : integer;
+        aluFast1, aluFast2 : alumno;
+    begin
+        cantRaros := 0;
+        aluFast1.ingreso := 1;
+        aluFast1.egreso := 9999;
+        aluFast2.ingreso := 1;
+        aluFast2.egreso := 9999; 
+        while(l <> nil) do begin
+            informarNotasAlu(l^.alu);
+            if (aluRaro(l^.alu)) then begin
+                cantRaros := cantRaros + 1;
+            end;
+            masRapidos(l^.alu,aluFast1,aluFast2);
+        end;
+        writeln('la cantidad de ingresantes del año 2012 que tienen dni con solo digitos impares es: ',cantRaros);
+        writeln('los 2 alumnos que mas rapido se recibieron fueron : ');
+        writeln(aluFast1.apellido);
+        writeln(aluFast1.nombres);
+        writeln(aluFast1.correo);
+        writeln('y');
+        writeln(aluFast2.apellido);
+        writeln(aluFast2.nombres);
+        writeln(aluFast2.correo);
+    end;
+    
+    procedure eliminarAlumno(var l : listaM; n : integer);
+    var
+        act,ant : listaM;
+    begin
+        act := l;
+        ant := l;
+        while (act <> nil) and (n <> act^.alu.num) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act <> nil) then begin
+            if (act = l) then begin
+                l := l^.sig;
+            end
+            else
+                ant^.sig := act^.sig;
+            dispose(act);
+        end;
+    end;
+    
+var
+    listAlu : listaM;
+    numeroEliminarAlu : integer;
+begin
+    cargarAlumnos(listAlu);
+    procesarAlumnos(listAlu);
+    write('ingrese el numero de alumno que salio sorteado para banearlo de la lista: ');
+    readln(numeroEliminarAlu);
+    eliminarAlumno(listAlu,numeroEliminarAlu);
+end.
