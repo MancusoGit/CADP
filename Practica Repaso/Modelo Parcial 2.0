@@ -1,0 +1,157 @@
+program preparcial;
+type
+
+    level = 1..5;
+
+    fecha = record 
+        dia : integer;
+        mes : integer;
+        year : integer;
+    end;
+
+    cliente = record
+        numero : integer;
+        dni : integer;
+        apellidoNombre : string;
+        nacimiento : fecha;
+        nivel : level;
+        puntaje : integer;
+    end;
+
+    clienteResumido = record
+        num : integer;
+        apeNom : string;
+    end;
+
+    niveles = array [level] of integer;
+
+    listaC = ^nodo;
+
+    nodo = record
+        cli : clienteResumido;
+        sig : listaC;
+    end;
+
+// modulos
+
+    procedure leerCliente(var c : cliente);
+    begin
+        read(c.dni);
+        read(c.numero);
+        read(c.apellidoNombre);
+        read(c.nacimiento.dia);
+        read(c.nacimiento.mes);
+        read(c.nacimiento.year);
+        read(c.nivel);
+        read(c.puntaje);
+        end;
+    end;
+
+    procedure agregarAdelante(var l : listaC; cr : clienteResumido);
+    var
+        nue : listaC;
+    begin
+        new(nue);
+        nue^.cli := cr;
+        nue^.sig := l;
+        l := nue;
+    end;
+
+    function corroboro (dni : integer) : boolean;
+    var
+        cantDigitos, cantImpares, dig : integer;
+    begin
+        cantDigitos := 0;
+        cantImpares := 0;
+        while (dni <> 0) do begin
+            dig := dni mod 10;
+            if ((dig mod 2) = 1) then begin
+                cantImpares := cantImpares + 1;
+            end;
+            cantDigitos := cantDigitos + 1;
+            dni := dni div 10;
+        end;
+        corroboro := (cantDigitos = cantImpares);
+    end;
+
+    procedure inicializarVectorContador(var vectorContador : niveles);
+    var
+        i : integer;
+    begin
+        for i := 1 to 5 do begin
+            vectorContador[i] := 0;
+        end;
+    end;
+
+    procedure procesarClientes(var l : listaC; vectorContador : niveles);
+    var
+        c :  cliente;
+        cr : clienteResumido;
+    begin
+        repeat
+            leerCliente(c):
+            if (corroboro(c.dni)) then begin
+                cr.num := c.numero;
+                cr.apeNom := c.apellidoNombre;
+                agregarAdelante(l,cr);
+            end;
+            if (c.nacimiento.year < 2000) then begin
+                vectorContador[c.nivel] := vectorContador[c.nivel] + c.puntaje;
+            end;
+        until (c.dni = 33444555);
+    end;
+
+    procedure eliminar (var l : listaC; n : integer);
+    var
+        act,ant : listaC;
+    begin
+        act := l;
+        ant := l;
+        while (act <> nil) and (n <> act^.cli.num) do begin
+            ant := act;
+            act := act^.sig;
+        end;
+        if (act <> nil) then begin
+            if (act = ant) then
+                l := l^.sig;
+            else
+                ant^.sig := act^.sig;
+            dispose(act);
+        end;
+    end;
+
+    procedure maximoYminimo (vectorContador : niveles);
+    var
+        i,nivelMax,nivelMin,puntajeMax,puntajeMin : integer;
+    begin
+        puntajeMax := -1;
+        puntajeMin := 9999;
+        for i := 1 to 5 do begin
+            if (vectorContador[i] >= puntajeMax) then begin
+                puntajeMax := vectorContador[i];
+                nivelMax := i;
+            end;
+            if (vectorContador[i] <= puntajeMin) then begin
+                puntajeMin := vectorContador[i];
+                nivelMin := i;
+            end;
+        end;
+        writeln('el nivel ',puntajeMax,' fue el que mas puntaje obtuvo');
+        writeln('el nivel ',puntajeMin, ' fue el que menos puntaje obtuvo');
+    end;
+
+//programa ppal.
+
+var
+    priListaClientes : listaC;
+    vectorContadorNiveles : niveles;
+    numeroEliminar : integer;
+begin
+    priListaClientes := nil;
+    inicializarVectorContador(vectorContadorNiveles);
+    procesarClientes(priListaClientes,vectorContadorNiveles);
+    maximoYminimo(vectorContadorNiveles);
+    read(numeroEliminar); //se dispone
+    eliminar(priListaClientes,numeroEliminar);
+end;
+
