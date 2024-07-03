@@ -1,0 +1,124 @@
+program parcialT1;
+
+type
+
+    anios = 2014..2024;
+    meses = 1..12;
+
+    compra =  record
+        codigo : integer;
+        mes : meses;
+        anio : anios;
+        monto : integer;
+        dni : integer;
+    end;    
+
+    lista = ^nodo;
+
+    nodo = record
+        elem : compra;
+        sig : lista;
+    end;
+
+    meses = array [meses] of integer;
+
+//modulos
+
+    procedure insertarOrdenado(var L:lista; c : compra);
+    var
+        nue, act, ant: lista;
+    begin
+        new (nue); 
+        nue^.dato := c; 
+        act := L; 
+        ant := L; 
+        while (act <> nil) and (c.dni > act^.dato.altura) do begin
+            ant := act;
+            act:= act^.sig;
+        end;
+        if (act = ant) then 
+            L:= nue; 
+        else 
+            ant^.sig:= nue;
+        nue^.sig:= act; 
+    end;
+
+    procedure recorrerListaOriginal(listaOriginal; var listaNueva; numeroIngresado : integer);
+    begin
+        while (listaOriginal <> nil) do begin
+            if (listaOriginal^.elem.anio =  numeroIngresado) then begin
+                insertarOrdenado(listaNueva,listaOriginal^.elem);
+            end;
+            listaOriginal := listaOriginal^.sig;
+    end;
+
+    procedure inicializarVector(var vec : meses);
+    var
+        i : integer;
+    begin
+        for i := 1 to 12 do begin
+            vec[i] := 0;
+        end;
+    end;
+
+    procedure minimos(vec : meses);
+    var
+        i, min1, min2, mes1, mes2 : integer;
+    begin
+        min1 := 9999;
+        min2 := 9999;
+        mes1 := 0;
+        mes2 := 0;
+        for i := 1 to 12 do begin
+            if (vec[i] <= min1) then begin
+                min2 := min1;
+                mes2 := mes1;
+                min1 := vec[i];
+                mes1 := i;
+            end
+            else if (vec[i] <= min2) then begin
+                min2 := vec[i];
+                mes2 := i;
+
+            end;
+        end;
+        write('los 2 meses con menor facturacion fueron: ', min1, min2);
+
+
+    end;
+
+    procedure procesarListaNueva(listaNueva);
+    var
+        dniActual, montoActual : integer;
+        vectorContador : meses;
+    begin
+        inicializarVector(vectorContador);
+        while (listaNueva <> nil) do begin
+            dniActual := listaNueva^.elem.dni;
+            montoActual := 0;
+            while (listaNueva <> nil) and (dniActual = listaNueva^.elem.dni) do begin
+                montoActual := montoActual + listaNueva^.elem.monto;
+                vectorContador[listaNueva^.elem.mes] := vectorContador[listaNueva^.elem.mes] + listaNueva^.elem.monto;
+                listaNueva := listaNueva^.sig;
+            end;
+            writeln('el cliente ',dniActual,' gasto: ',montoActual);
+        end;
+        minimos(vectorContador);
+    end;
+
+
+
+//programa principal
+
+var
+    listaOriginal, listaNueva : lista;
+    numeroIngresado : integer;
+
+begin
+    listaOriginal := nil;
+    cargarLista(lista); //se dispone
+    listaNueva := nil;
+    read(numeroIngresado);
+    recorrerListaOriginal(listaOriginal,listaNueva,numeroIngresado); //inciso a.
+    procesarListaNueva(listaNueva); //inciso b.<<
+end.
