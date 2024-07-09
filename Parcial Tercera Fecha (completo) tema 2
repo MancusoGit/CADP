@@ -1,0 +1,181 @@
+program parcial;
+
+const
+
+    temporada = 2022;
+
+type
+     
+    equipos = 1..28;
+
+    puntuacion = 0..10;
+
+    fechas = 1..18;
+
+    vectorFechas = array of [fechas] of puntuacion;
+
+    jugador = record
+        codigo : integer;
+        apeNom : string;
+        equipo : equipos;
+        nacimiento : integer;
+        calificaciones : vectorFechas;
+    end;
+
+    lista = ^nodo;
+
+    nodo = record
+        dato : jugador;
+        sig : lista;
+    end;
+
+    vectorContador = array of [equipos] of integer;
+
+
+
+
+// modulos 
+
+function cumple (edad : integer) : boolean;
+begin
+    cumple := (edad =< 30);
+end;
+
+function corroboroFechas (vector : vectorFechas) : boolean;
+var 
+    i, cantFechas : integer;
+begin
+    cantFechas := 0;
+    for i := 1 to 18 do begin
+        if(vector[i] <> 0) then
+            cantFechas := cantFechas + 1;
+    end;
+    corroboroFechas := (cantFechas > 9);
+end;
+
+procedure maximos (var jugMax1, jugMax2 : integer; var promMax1, promMax2 : real; jug : jugador);
+var
+    i, cantFechas, total, resultado : integer;
+begin
+
+    cantFechas := 0;
+    total := 0;
+    for i := 1 to 18 do begin
+        if (jug.calificaciones[i] <> 0) then begin
+            cantFechas := cantFechas + 1;
+            total := total + jug.calificaciones[i];
+        end;
+    end;
+
+    resultado := total / cantFechas;
+
+    if (resultado >= promMax1) then begin
+        promMax2 := promMax1;
+        jugMax2 := jugMax1;
+        jugMax1 := jug.codigo;
+        promMax1 := resultado;
+    end
+    else if (resultado >= promMax2) then begin
+        jugMax2 := jug.codigo;
+        promMax2 := resultado;
+    end;
+end; 
+
+procedure inicializarVector(var vector : vectorContador);
+var 
+    i : integer;
+begin
+    for i := 1 to 28 do begin
+        vector[i] := 0;
+    end;
+end;
+
+function laconchadetumadre (temp : integer ; jug : jugador) : boolean;
+var
+    dig, cantPares, resultado : integer;
+begin
+    resultado := temp - jug.nacimiento;
+    if (resultado >= 1987) and (resultado =< 1991) then begin
+        cantPares := 0;
+        while (jug.codigo <> 0 do) begin
+            dig := jug.codigo mod 10;
+            if ((dig mod 2) = 0) then
+                cantPares := cantPares + 1;
+            jug.codigo := jug.codigo div 10;
+        end;
+
+        laconchadetumadre := (cantPares = 2);
+    else
+        laconchadetumadre := false;
+end;
+
+procedure insertarOrdenado(var L : lista; jug: jugador);
+var
+    nue, act, ant : lista;
+begin
+    new(nue);
+    nue^.dato := jug;
+    act := L;
+    ant := L;
+    while (act <> nil) and (jug.codigo > act^.dato.codigo) do begin
+        ant := act;
+        act := act^.sig;
+    end;
+    if (act = ant) then
+        L := nue;
+    else
+        ant^.sig := nue;
+    nue^.sig := act;
+end;
+
+procedure moduloRompeBolas (L : lista; var LN : lista);
+begin
+    while (L <> nil) do begin
+        if (laconchadetumadre(temporada,L^.dato)) then
+            insertarOrdenado(LN,L^.dato);
+        L := L^.sig;
+    end;
+end;
+
+
+
+procedure procesarLista(L : lista);
+var
+    i, jugMax1, jugMax2, edad : integer;
+    promMax1, promMax2 : real;
+    vectorEquipos : vectorContador;
+begin
+    inicializarVector(vectorEquipos);
+    jugMax1 := 0;
+    jugMax2 := 0;
+    promMax1 := 9999;
+    promMax2 := 9999;
+    while (L <> nil) do begin
+        edad := temporada - L^.dato.nacimiento;
+        if (cumple(edad)) then
+            vectorEquipos[L^.dato.equipo] := vectorEquipos[L^.dato.equipo] + 1;
+        
+        if(corroboroFechas(L^.dato.calificaciones)) then
+            maximos(jugMax1,jugMax2,promMax1,promMax2,pI^.dato);
+        
+        L := L^.sig;
+    end;
+
+    write(jugMax1,jugMax2);
+    
+    for i := 1 to 28 do begin
+        write(vectorEquipos[i]);
+    end;
+
+end;
+
+var
+    L,LN : lista;
+
+begin
+    L := nil;
+    cargarLista(L); //se dispone
+    procesarLista(L);
+    LN := nil;
+    moduloRompeBolas(L,LN);
+end.
