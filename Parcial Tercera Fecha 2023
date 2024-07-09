@@ -1,0 +1,103 @@
+program parcialF3;
+
+const
+
+    temporada = 2022;
+
+type
+
+    calificacion = 0..10;
+
+    equipoCod = 1..28;
+
+    vectorFechas = array of [1..27] of calificacion;
+
+    jugador = record
+        codigo : integer;
+        apeNom : string;
+        equipo : equipoCod;
+        nacimiento : integer;
+        calificaciones :  vectorFechas;
+    end;
+
+    lista = ^nodo;
+
+    nodo = record
+        dato : jugador;
+        sig : lista;
+    end;
+
+    vectorContador = array of [equipoCod] of integer;
+
+
+
+//modulos
+
+    function cumple (edad : integer) : boolean;
+    begin
+        cumple := (edad >= 35);
+    end;
+
+    function corroboroFechas (vec : vectorFechas) : boolean;
+    var
+        i,cantFechas : integer;
+    begin
+        cantFechas := 0;
+        for i := 1 to 27 do begin
+            if (vec[i] <> 0) then
+                cantFechas := cantFechas + 1;
+        end;
+        corroboroFechas := (cantFechas > 14);
+    end;
+
+    function calcularPromedio (vec : vectorFechas) : real;
+    var
+        i, cantPartidos, total : integer;
+    begin
+        cantPartidos := 0;
+        total := 0;
+        for i := 1 to 27 do begin
+            if (vec[i] <> 0) then 
+                cantPartidos := cantPartidos + 1;
+            total := total + vec[i];
+        end;
+        calcularPromedio := total / cantPartidos;
+    end;
+
+    procedure maximos (var JugMax1, JugMax2 : integer; var promMax1, promMax2 : real; codJugador : integer; promedio : real);
+    begin
+       //se dispone
+    end;
+
+
+    procedure procesarLista(pI : lista);
+    var
+        JugMax1, JugMax2 : integer;
+        promMax1, promMax2 : real;
+        equipos : vectorContador;
+    begin
+        inicializarVector(equipos);
+        JugMax1 := 0;
+        JugMax2 := 0;
+        promMax1 := -9999;
+        promMax2 := -9999;
+        while (pI <> nil) do begin
+            if (cumple(temporada - pI^.dato.nacimiento)) then 
+                equipos[pI^.dato.equipo] := equipos[pI^.dato.equipo] + 1;
+            if (corroboroFechas(pI^.dato.calificaciones)) then begin
+                maximos(JugMax1,JugMax2,promMax1,promMax2,pI^.dato.codigo,calcularPromedio(pI^.dato.calificaciones));
+            pI := pI^.sig;
+        end;
+        write(JugMax1,JugMax2);
+        for i := 1 to 28 do begin
+            write(equipos[i]);
+        end;
+    end;
+
+    var
+        pI : lista;
+    begin
+        pI, PI2 := nil;
+        cargarLista(pI); // se dispone
+        procesarLista(pI);
+    end;
