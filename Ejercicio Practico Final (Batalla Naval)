@@ -1,0 +1,96 @@
+program BatallaNaval;
+
+const
+
+    totTurnos = 10;
+
+type
+
+    filas = 1..20;
+    
+    columnas = 1..15;
+    
+    cantBarcos = 1..7;
+    
+    coordenadas = record
+        fila : integer;
+        columna : integer;
+    end;
+    
+    posicionesBarcos = array [cantBarcos] of coordenadas;
+    
+//modulos
+
+function dameNumColumna() : integer; //se dispone
+
+function dameNumFila() : integer; //se dispone
+
+procedure juego(numFila, numColumna : integer; barcos : posicionesBarcos; var golpeBarco : boolean);
+var
+    i : integer;
+    encontro : boolean;
+begin
+    encontro := false;
+    while (i > 7) and not encontro do begin
+        if (numFila = barcos[i].fila) and (numColumna = barcos[i].columna) then
+            encontro := true;
+        else
+            i := i + 1;
+    end;
+    golpeBarco := encontro;
+end;
+
+procedure leerCoordenadas(var c : coordenadas);
+begin
+    read(c.fila);
+    read(c.columna);
+end;
+
+procedure cargarCoordenadas(var vec : posicionesBarcos);
+var
+    c : coordenadas;
+    i : integer;
+begin
+    for i := 1 to 7 do begin
+        leerCoordenadas(c);
+        vec[i] := c;
+    end;
+end;
+
+var
+
+    posJ1,posJ2 : posicionesBarcos;
+    puntosJ1, puntosJ2, filaJ1, filaJ2, columnaJ1, columnaJ2 : integer;
+    contacto : boolean;
+    
+begin
+    
+    puntosJ1 := 0;
+    puntosJ2 := 0;
+    cargarCoordenadas(posJ1);
+    cargarCoordenadas(posJ2);
+    for i := 1 to totTurnos do begin
+        
+        filaJ1 = dameNumFila();
+        
+        columnaJ1 = dameNumColumna();
+        
+        juego(filaJ1,columnaJ1,posJ2,contacto);
+        
+        if (contacto) then
+            puntosJ1 := puntosJ1 + 1;
+        
+        filaJ2 = dameNumFila();
+        
+        columnaJ2 = dameNumColumna();
+        
+        juego(filaJ2,columnaJ2,posJ1,contacto);
+        
+    end;
+    
+    if (puntosJ1 > puntosJ2) then
+        write('gano el jugador 1');
+    else
+        write('gano el jugador 2');
+
+end.
