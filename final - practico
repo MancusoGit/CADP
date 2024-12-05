@@ -1,0 +1,91 @@
+{
+Se dispone de la información de los participantes inscriptos a una carrera (a lo sumo 5000). De
+cada participante se tiene DNI, nombre y apellido, categoría (1..5) y fecha de inscripción. Se
+pide implementar un programa que guarde en una estructura adecuada los participantes de
+aquellas categorías que posean a lo sumo 50 inscriptos. Se sabe que cada participante se
+puede anotar en una sola categoríaSe dispone de la información de los participantes inscriptos a una carrera (a lo sumo 5000). De
+cada participante se tiene DNI, nombre y apellido, categoría (1..5) y fecha de inscripción. Se
+pide implementar un programa que guarde en una estructura adecuada los participantes de
+aquellas categorías que posean a lo sumo 50 inscriptos. Se sabe que cada participante se
+puede anotar en una sola categoría
+}
+
+program Hello;
+
+type
+    
+    subrangoCat = 1..5;
+    
+    fecha = record
+        dia : integer;
+        mes : integer;
+        anio : integer;
+    end;
+    
+    participante = record
+        nombreApellido : string;
+        dni : integer;
+        categoria : subrangoCat;
+        fechaInscripcion : fecha;
+    end;
+    
+    lista = ^nodo;
+    
+    nodo = record
+        elem : participante;
+        sig : lista;
+    end;
+    
+    vectorContador = array [subrangoCat] of integer;
+    
+//modulos
+
+    procedure agregarAdelante(var pi : lista; p : participante);
+    var
+        nue : lista;
+    begin
+        new(nue);
+        nue^.elem := p;
+        nue^.sig := pi;
+        pi := nue;
+    end;
+    
+    procedure inicializarVector(var v : vectorContador);
+    var
+        i : integer;
+    begin
+        for i := 1 to 5 do begin
+            v[i] := 0;
+        end;
+    end;
+    
+    procedure contabilizarInscriptos(p : lista; var v : vectorContador);
+    begin
+        while (p <> nil) do begin
+            v[p^.elem.categoria] := v[p^.elem.categoria] + 1;
+            p := p^.sig;
+        end;
+    end;
+    
+    
+    procedure generarListaNueva(pi : lista; var pn : lista; v : vectorContador);
+    begin
+        while (pi <> nil) do begin
+            if (v[pi^.elem.categoria] > 50) then begin
+                agregarAdelante(pn,pi^.elem);
+            end;
+            pi := pi^.sig;
+        end;
+    end;
+    
+var
+    listaInicial, listaNueva : lista;
+    contadorCategorias : vectorContador;
+begin
+    listaInicial := nil;
+    cargarLista(listaInicial); //se dispone
+    inicializarVector(contadorCategorias);
+    contabilizarInscriptos(listaInicial,contadorCategorias);
+    listaNueva := nil;
+    generarListaNueva(listaInicial,listaNueva,contadorCategorias);
+end.
